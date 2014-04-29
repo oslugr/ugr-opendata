@@ -1,0 +1,45 @@
+---
+- hosts: servidor
+  sudo: yes
+  tasks:
+    - name: Instalar nginx
+      apt: pkg=nginx state=present
+    - name: Instalar apache
+      apt: pkg=apache2 state=present
+    - name: Instalar wsgi para apache
+      apt: pkg=libapache2-mod-wsgi state=present
+    - name: Instalar libpq5
+      apt: pkg=libpq5 state=present
+
+    - name: Descargarmos ckan
+      command: wget http://packaging.ckan.org/python-ckan_2.2_amd64.deb
+    - name: instalamos ckan
+      command: dpkg -i python-ckan_2.2_amd64.deb
+    - name: comprobamos errores con wsgi
+      command: a2enmod wsgi
+    - name: Reniciamos apache
+      service: name=apache2 state=restarted
+    - name: Instalar postgresql
+      apt: pkg=postgresql state=present
+    - name: Instalar jetty
+      apt: pkg=solr-jetty state=present
+    - name: copiar configuracion de jetty
+      command: cp configuraciones/jetty /etc/default
+    - name: Iniciamos jetty
+      service: name=jetty state=started
+    - name: reemplazar schema.xml
+      command: mv /etc/solr/conf/schema.xml /etc/solr/conf/schema.xml.bak
+    - name: crear enlace simbolico
+      command: ln -s /usr/lib/ckan/default/src/ckan/ckan/config/solr/schema.xml /etc/solr/conf/schema.xml
+    - name: Iniciamos jetty
+      service: name=jetty state=restarted
+    - name: Copiamos la configuración de ckan
+      command: cp configuraciones/production.ini /etc/ckan/default
+    - name: Iniciamos la base de datos de CKAN
+      command: ckan db init
+    - name: Reniciamos apache
+      service: name=apache2 state=restarted
+    - name: Reniciamos nginx
+      service: name=nginx state=restarted
+
+
