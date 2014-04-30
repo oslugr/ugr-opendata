@@ -1,3 +1,6 @@
 [servidor]
 opendata.ugr.es
 
+[test]
+pruebas-osl.cloudapp.net
+

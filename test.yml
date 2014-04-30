@@ -1,5 +1,5 @@
 ---
-- hosts: servidor
+- hosts: test
   sudo: yes
   tasks:
     - name: Instalar nginx
