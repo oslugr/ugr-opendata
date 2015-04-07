@@ -1,0 +1,138 @@
+---
+- hosts: ckan
+  sudo: yes
+  remote_user: vagrant
+  vars:
+    - db_name: ckan_default
+    - db_user: ckan_default
+    - db_password: vagrantpass
+  tasks:
+    - name: Actualizamos paquetes
+      shell: apt-get update
+
+    ######### Instalación de CKAN
+
+    - name: Instalamos paquetes requeridos por CKAN
+      apt: pkg={{ item }} state=installed
+      with_items:
+        - git
+        - nginx
+        - apache2
+        - libapache2-mod-wsgi
+        - libpq5
+        - wget
+        - postgresql-9.1
+        - solr-jetty
+        - python
+        - python-psycopg2
+        - openjdk-6-jdk
+        - python-pycurl
+        - python-software-properties
+      when: ansible_pkg_mgr == 'apt'
+      register: salida
+
+    - debug: msg="{{ salida.stdout }}"
+    - debug: msg="{{ salida.stderr }}"
+
+
+    - name: Descargamos el paquete CKAN
+      shell: wget http://packaging.ckan.org/python-ckan_2.2_amd64.deb
+
+    - name: Instalamos CKAN
+      shell: dpkg -i python-ckan_2.2_amd64.deb
+
+    - name: Reiniciamos Apache
+      service: name=apache2 state=restarted
+
+    ######### Instalación de PostgreSQL y Solr
+
+    - name: Editamos el archivo de configuración Jetty...1/4
+      shell: sed -i -e 's/.*NO_START.*/NO_START=0/' /etc/default/jetty
+
+    - name: Editamos el archivo de configuración Jetty...2/4
+      shell: sed -i -e 's/.*JETTY_HOST.*/JETTY_HOST=127.0.0.1/' /etc/default/jetty
+
+    - name: Editamos el archivo de configuración Jetty...3/4
+      shell: sed -i -e 's/.*JETTY_PORT.*/JETTY_PORT=8983/' /etc/default/jetty
+
+    - name: Editamos el archivo de configuración Jetty...4/4
+      shell: sed -i -e 's/.*JAVA_HOME.*/JAVA_HOME=\/usr\/lib\/jvm\/java-6-openjdk-amd64\//' /etc/default/jetty
+
+    - name: Iniciamos Jetty
+      service: name=jetty state=started
+
+    - name: Reemplazamos 'schema.xml' 1/2
+      shell: mv /etc/solr/conf/schema.xml /etc/solr/conf/schema.xml.bak
+    - name: Reemplazamos 'schema.xml' 2/2
+      shell: ln -s /usr/lib/ckan/default/src/ckan/ckan/config/solr/schema.xml /etc/solr/conf/schema.xml
+
+    - name: Reiniciamos Jetty
+      service: name=jetty state=restarted
+
+    - name: Cambiamos dirección de servidor Solr en archivo de configuración CKAN
+      shell: sed -i -e 's/.*solr_url.*/solr_url=http:\/\/127.0.0.1:8983\/solr/' /etc/ckan/default/production.ini
+
+    - name: Creamos nuevo usuario en la base de datos de PostgreSQL llamado ckan_default
+      postgresql_user: name={{ db_user }} password={{ db_password }} role_attr_flags=NOSUPERUSER,NOCREATEROLE,NOCREATEDB
+      sudo_user: postgres
+
+    - name: Creamos la base de datos ckan_default
+      postgresql_db: name={{ db_name }} encoding='UTF-8' owner={{ db_user }}
+      sudo_user: postgres
+
+    - name: Set CKAN database server address
+      shell: sed -i -e 's/sqlalchemy.url.*/sqlalchemy.url = postgresql:\/\/{{ db_user }}:{{ db_password }}@localhost\/{{ db_name }}/' /etc/ckan/default/production.ini
+
+    - name: Inicializamos base de datos CKAN
+      shell: ckan db init
+
+    ######### Instalación de DataStore
+
+    - name: Habilitamos el plugin datastore
+      shell: sed -i -e 's/ckan.plugins = /ckan.plugins = datastore /' /etc/ckan/default/production.ini
+
+    - name: Creamos nuevo usuario en la base de datos de PostgreSQL llamado datastore_default
+      postgresql_user: name=datastore_default password={{ db_password }} role_attr_flags=NOSUPERUSER,NOCREATEROLE,NOCREATEDB,LOGIN
+      sudo_user: postgres
+
+    - name: Creamos la base de datos datastore_default
+      postgresql_db: name=datastore_default encoding='UTF-8' owner={{ db_user }}
+      sudo_user: postgres
+
+    - name: Editamos la dirección de escritura de la base de datos del datastore
+      shell: sed -i -e 's/.*ckan.datastore.write_url.*/ckan.datastore.write_url = postgresql:\/\/{{ db_user }}:{{ db_password }}@localhost\/datastore_default/' /etc/ckan/default/production.ini
+
+    - name: Editamos la dirección de lectura de la base de datos del datastore
+      shell: sed -i -e 's/.*ckan.datastore.read_url.*/ckan.datastore.read_url = postgresql:\/\/datastore_default:{{ db_password }}@localhost\/datastore_default/' /etc/ckan/default/production.ini
+
+    - name: Establecemos permisos
+      shell: ckan datastore set-permissions postgres
+
+    - name: Habilitamos DataPusher automático
+      shell: sed -i -e 's/.*ckan.datapusher.url.*/ckan.datapusher.url = http:\/\/0.0.0.0:8800/' /etc/ckan/default/production.ini
+
+    - name: Configuramos la URL del sitio
+      shell: sed -i -e 's/ckan.site_url.*/ckan.site_url = http:\/\/127.0.0.1' /etc/ckan/default/production.ini
+
+    - name: Habilitamos el plugin datapusher
+      shell: sed -i -e 's/ckan.plugins = /ckan.plugins = datapusher /' /etc/ckan/default/production.ini
+
+    ######### Instalación de FileStore & File Uploads
+
+    - name: Creamos el directorio donde se almacenarán nuestros archivos
+      shell: mkdir -p /var/lib/ckan/default
+
+    - name: Añadimos la ruta al archivo de configuración de CKAN
+      shell: sed -i -e 's/.*ckan.storage_path.*/ckan.storage_path = \/var\/lib\/ckan\/default/' /etc/ckan/default/production.ini
+
+    - name: Establecemos permisos a la ruta 1/2
+      shell: chown www-data /var/lib/ckan/default
+
+    - name: Establecemos permisos a la ruta 2/2
+      shell: chmod u+rwx /var/lib/ckan/default
+
+    - name: Reiniciamos Apache
+      service: name=apache2 state=restarted
+
+    - name: Reiniciamos Nginx
+      service: name=nginx state=restarted
