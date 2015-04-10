@@ -12,6 +12,12 @@
 
     ######### Instalación de CKAN
 
+    - name: Forzamos configuración de 'locales' 1/2 para solucionar error al crear BD
+      shell: locale-gen es_ES es_ES.UTF-8
+
+    - name: Forzamos configuración de 'locales' 2/2 para solucionar error al crear BD
+      shell: dpkg-reconfigure locales
+
     - name: Instalamos paquetes requeridos por CKAN
       apt: pkg={{ item }} state=installed
       with_items:
@@ -26,13 +32,12 @@
         - python
         - python-psycopg2
         - openjdk-6-jdk
-        - python-pycurl
-        - python-software-properties
-      when: ansible_pkg_mgr == 'apt'
-      register: salida
+      environment:
+          LC_ALL: es_ES.UTF-8
+      #register: salida
 
-    - debug: msg="{{ salida.stdout }}"
-    - debug: msg="{{ salida.stderr }}"
+    #- debug: msg="{{ salida.stdout }}"
+    #- debug: msg="{{ salida.stderr }}"
 
 
     - name: Descargamos el paquete CKAN
