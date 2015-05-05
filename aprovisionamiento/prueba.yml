@@ -117,7 +117,7 @@
       shell: sed -i -e 's/.*ckan.datapusher.url.*/ckan.datapusher.url = http:\/\/0.0.0.0:8800/' /etc/ckan/default/production.ini
 
     - name: Configuramos la URL del sitio
-      shell: sed -i -e 's/ckan.site_url.*/ckan.site_url = http:\/\/127.0.0.1' /etc/ckan/default/production.ini
+      shell: sed -i -e 's/ckan.site_url.*/ckan.site_url = http:\/\/127.0.0.1/' /etc/ckan/default/production.ini
 
     - name: Habilitamos el plugin datapusher
       shell: sed -i -e 's/ckan.plugins = /ckan.plugins = datapusher /' /etc/ckan/default/production.ini
