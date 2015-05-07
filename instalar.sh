@@ -1,5 +1,5 @@
 #!/bin/bash
 
-export ANSIBLE_HOSTS=./ansible_hosts
+export ANSIBLE_HOSTS=./aprovisionamiento/ansible_hosts
 
-ansible-playbook servidor.yml
+ansible-playbook ckan.yml
