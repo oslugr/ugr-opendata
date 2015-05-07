@@ -7,7 +7,7 @@ una máquina con CKAN para poder montar un portal de datos abiertos.
 
 ## Uso
 
-1.- Pondremos la dirección IP de la máquina en la que vamos a realizar dicha instalación en el fichero aprovisionamiento/ansible_hosts
+1.- Pondremos la dirección IP de la máquina en la que vamos a realizar dicha instalación en el fichero aprovisionamiento/ansible_hosts.
 ```
 [ckan]
 192.168.33.33
@@ -24,16 +24,16 @@ vars:
 ...
 ```
 
-3.- Asegurarnos que tenemos acceso por ssh a la máquina
+3.- Asegurarnos que tenemos acceso por ssh a la máquina.
 
-4.- Ejecutamos el programa de aprovisionamiento
+4.- Ejecutamos el programa de aprovisionamiento.
 ```
 ./instalar.sh
 ```
 
 ## Nota
-Este aprovisiomiento sólo está disponible para una instalación sobre Ubuntu 12.04
-Estamos trabajando para realizarlo sobre cualquier distribución Linux
+Este aprovisiomiento sólo está disponible para una instalación sobre Ubuntu 12.04.
+Estamos trabajando para realizarlo sobre cualquier distribución Linux.
 
 ### URL
 
