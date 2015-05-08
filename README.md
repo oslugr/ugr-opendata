@@ -1,9 +1,7 @@
-ugr-opendata
+Open Data en la UGR
 ============
 
-Aplicación web para la apertura de datos basada en CKAN.
-Podemos encontrar los archivos necesarios para aprovisionar
-una máquina con CKAN para poder montar un portal de datos abiertos.
+Repositorio para temas relacionados con el [servidor de datos abiertos de la UGR](http://opendata.ugr.es).
 
 ## Uso
 
@@ -32,6 +30,7 @@ vars:
 ```
 
 ## Nota
+
 Este aprovisiomiento sólo está disponible para una instalación sobre Ubuntu 12.04.
 Estamos trabajando para realizarlo sobre cualquier distribución Linux.
 
