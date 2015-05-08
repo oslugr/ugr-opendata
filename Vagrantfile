@@ -13,6 +13,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "Debian7"
 
   config.vm.provision "ansible" do |ansible|
+    ansible.inventory_path = "aprovisionamiento/ansible_hosts_vagrant"
     ansible.playbook = "aprovisionamiento/ckan.yml"
   end
   # The url from where the 'config.vm.box' box will be fetched if it
