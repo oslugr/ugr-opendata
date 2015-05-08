@@ -93,8 +93,11 @@
 
     ######### Instalación de DataStore
 
-    - name: Habilitamos el plugin datastore
-      shell: sed -i -e 's/ckan.plugins = /ckan.plugins = datastore /' /etc/ckan/default/production.ini
+#    - name: Habilitamos el plugin datastore
+#      shell: sed -i -e 's/ckan.plugins = /ckan.plugins = datastore /' /etc/ckan/default/production.ini
+
+    - name: Alternativa con replace
+      replace: dest=/etc/ckan/default/production.ini regexp='/ckan.plugins = ' replace='/ckan.plugins = datastore' backup=yes
 
     - name: Creamos nuevo usuario en la base de datos de PostgreSQL llamado datastore_default
       postgresql_user: name=datastore_default password={{ db_password }} role_attr_flags=NOSUPERUSER,NOCREATEROLE,NOCREATEDB,LOGIN
