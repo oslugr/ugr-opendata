@@ -34,6 +34,17 @@ vars:
 Este aprovisiomiento sólo está disponible para una instalación sobre Ubuntu 12.04.
 Estamos trabajando para realizarlo sobre cualquier distribución Linux.
 
+## Uso con Vagrant
+
+Tal como está ahora mismo, Vagrant trabaja sobre una máquina llamada `Debian7`. Una vez descargada,
+
+```
+vagrant up
+vagrant provision
+```
+
+y debería funcionar.
+
 ### URL
 
 [opendata.ugr.es](opendata.ugr.es)
