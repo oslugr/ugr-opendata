@@ -56,7 +56,7 @@ sqlalchemy.url = postgresql://ckan_default:**pass**@localhost/ckan_default
 **JETTY_PORT=8983**
 
 
-`service jetty start`
+`service jetty8 start`
 
 `mv /etc/solr/conf/schema.xml /etc/solr/conf/schema.xml.bak`
 
