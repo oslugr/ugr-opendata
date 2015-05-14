@@ -4,7 +4,7 @@
 
 `apt-get update && apt-get dist-upgrade`
 
-`apt-get install python-dev postgresql libpq-dev python-pip python-virtualenv git-core solr-jetty openjdk-7-jdk python-pastescript apache2 libapache2-mod-wsgi libapache2-mod-rpaf nginx build-essential libxslt1-dev libxml2-dev git`
+`apt-get install python-dev postgresql libpq-dev python-pip python-virtualenv git-core solr-jetty8 openjdk-7-jdk python-pastescript apache2 libapache2-mod-wsgi libapache2-mod-rpaf nginx build-essential libxslt1-dev libxml2-dev git`
 
 `apt-get install postfix` 
 
