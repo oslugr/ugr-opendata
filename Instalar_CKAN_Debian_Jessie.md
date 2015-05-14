@@ -1,4 +1,4 @@
-# <center>Instalación de CKAM en Debian Jessie</center>
+# <center>Instalación de CKAN en Debian Jessie</center>
 
 `sudo su`
 
