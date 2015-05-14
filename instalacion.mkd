@@ -81,7 +81,7 @@ sqlalchemy.url = postgresql://ckan_default:**pass**@localhost/ckan_default
 
 + (Asegurando de que **. /usr/lib/ckan/default/bin/activate)**
 
-`cd /usr/lib/ckan/default/src/ckan
+`cd /usr/lib/ckan/default/src/ckan`
 
 `paster serve /etc/ckan/default/development.in`
 
