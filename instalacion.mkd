@@ -12,7 +12,7 @@
 
 `mkdir -p /usr/lib/ckan/default` 
 
-chown `whoami` /usr/lib/ckan/default
+chown \`whoami` /usr/lib/ckan/default
 
 `virtualenv --no-site-packages /usr/lib/ckan/default`
 
@@ -32,7 +32,7 @@ chown `whoami` /usr/lib/ckan/default
 
 `mkdir -p /etc/ckan/default`
 
-chown -R `whoami` /etc/ckan/
+chown -R \`whoami` /etc/ckan/
 
 `cd /usr/lib/ckan/default/src/ckan`
 
@@ -91,8 +91,27 @@ sqlalchemy.url = postgresql://ckan_default:**pass**@localhost/ckan_default
 
 
 
-
 ### <center>DESPLEGAR INSTALACIÓN PARA PRODUCCIÓN</center>
+
+
+
+`nano /etc/apache2/apache2.conf`
+
++ añadir -> **ServerName localhost** al final del archivo
+
+
+`nano /etc/ckan/default/apache.wsgi`
+
+
++ import os
+activate_this = os.path.join('/usr/lib/ckan/default/bin/activate_this.py')
+execfile(activate_this, dict(__file__=activate_this))
+
+from paste.deploy import loadapp
+config_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'production.ini')
+from paste.script.util.logging_config import fileConfig
+fileConfig(config_filepath)
+application = loadapp('config:%s' % config_filepath)
 
 
 
