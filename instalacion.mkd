@@ -105,21 +105,54 @@ sqlalchemy.url = postgresql://ckan_default:**pass**@localhost/ckan_default
 
 
 
-> import os
+```
+import os
+activate_this = os.path.join('/usr/lib/ckan/default/bin/activate_this.py')
+execfile(activate_this, dict(__file__=activate_this))
 
-> activate_this = os.path.join('/usr/lib/ckan/default/bin/activate_this.py')
+from paste.deploy import loadapp
+config_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'production.ini')
+from paste.script.util.logging_config import fileConfig
+fileConfig(config_filepath)
+application = loadapp('config:%s' % config_filepath)
+```
 
-> execfile(activate_this, dict( \__file__=activate_this))
 
-> from paste.deploy import loadapp
+`nano /etc/apache2/sites-available/ckan_default.conf`
 
-> config_filepath = os.path.join(os.path.dirname(os.path.abspath(\__file__)), 'production.ini')
 
-> from paste.script.util.logging_config import fileConfig
+```
+WSGISocketPrefix /var/run/wsgi
+<VirtualHost 127.0.0.1:8080>
+    ServerName default.pruebackan1404.cloudapp.net
+    ServerAlias www.default.pruebackan1404.cloudapp.net
+    WSGIScriptAlias / /etc/ckan/default/apache.wsgi
 
-> fileConfig(config_filepath)
+    # Pass authorization info on (needed for rest api).
+    WSGIPassAuthorization On
 
-> application = loadapp('config:%s' % config_filepath)
+    # Deploy as a daemon (avoids conflicts between CKAN instances).
+    WSGIDaemonProcess ckan_default display-name=ckan_default processes=2 threads=15
+
+    WSGIProcessGroup ckan_default
+    
+    # Allow access to all connections
+    <Directory /etc/ckan/default>
+        Options All
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog /var/log/apache2/ckan_default.error.log
+    CustomLog /var/log/apache2/ckan_default.custom.log combined
+
+    <IfModule mod_rpaf.c>
+        RPAFenable On
+        RPAFsethostname On
+        RPAFproxy_ips 127.0.0.1
+    </IfModule>
+</VirtualHost>
+```
 
 
 
