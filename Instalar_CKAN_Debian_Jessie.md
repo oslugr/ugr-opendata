@@ -227,9 +227,9 @@ chmod u+rwx /var/lib/ckan/default
 
 `exit` para salir de **root**, pues si no, no me funcionaba:
 
-`-u postgres createuser -S -D -R -P -l datastore_default`
+`sudo -u postgres createuser -S -D -R -P -l datastore_default`
 
-`-u postgres createdb -O ckan_default datastore_default -E utf-8`
+`sudo -u postgres createdb -O ckan_default datastore_default -E utf-8`
 
 > Volvemos a **root**:
 
@@ -245,7 +245,7 @@ chmod u+rwx /var/lib/ckan/default
 
 `cd /etc/ckan/default/`
 
-`paster --plugin=ckan datastore set-permissions -c production.ini | -u postgres psql`
+`paster --plugin=ckan datastore set-permissions -c production.ini | sudo -u postgres psql`
 
 > Si da error es por `sudo`, hacemos lo mismo que antes
 
