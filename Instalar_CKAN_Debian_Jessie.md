@@ -97,7 +97,7 @@ sqlalchemy.url = postgresql://ckan_default:**pass**@localhost/ckan_default
 
 `nano /etc/apache2/apache2.conf`
 
-+ añadir -> **ServerName localhost** al final del archivo
+> añadir -> **ServerName localhost** al final del archivo
 
 
 `nano /etc/ckan/default/apache.wsgi`
@@ -183,6 +183,7 @@ server {
 
 }
 ```
+
 `chmod -R 775 /etc/ckan`
 `a2ensite ckan_default`
 `a2dissite 000-default`
@@ -190,6 +191,10 @@ server {
 `ln -s /etc/nginx/sites-available/ckan_default /etc/nginx/sites-enabled/ckan_default`
 `service apache2 reload`
 `service nginx reload`
+
+**Aquí no me iniciaba nginx con apache2, (is set to 1 on the firewall computer):** [Fuente](http://www.linuxquestions.org/questions/linux-software-2/unable-to-load-images-4175514033/)
+
+`nano /proc/sys/net/ipv4/ip_forward`
 
 ### INSTALAR FILESTORE
 
@@ -213,39 +218,42 @@ chmod u+rwx /var/lib/ckan/default
 `datastore` 
 > a la lista 
 `ckan.plugins`
-```
--u postgres createuser -S -D -R -P -l datastore_default
--u postgres createdb -O ckan_default datastore_default -E utf-8
-```
+
+`exit` para salir de **root**, pues si no, no me funcionaba:
+
+`-u postgres createuser -S -D -R -P -l datastore_default`
+`-u postgres createdb -O ckan_default datastore_default -E utf-8`
+
+> Volvemos a **root**:
+
+`sudo su`
+
 `nano /etc/ckan/default/production.ini`
 > Descomentar y adaptar `pass`
-```
-ckan.datastore.write_url = postgresql://ckan_default:prueba@localhost/datastore_default
-ckan.datastore.read_url = postgresql://datastore_default:prueba@localhost/datastore_default
-```
 
-```
-cd /etc/ckan/default/
-paster --plugin=ckan datastore set-permissions -c production.ini | sudo -u postgres psql
+`ckan.datastore.write_url = postgresql://ckan_default:prueba@localhost/datastore_default`
+`ckan.datastore.read_url = postgresql://datastore_default:prueba@localhost/datastore_default`
 
-curl http://pruebackan1404.cloudapp.net/api/3/action/datastore_search?resource_id=_table_metadata
-curl -X GET "http://localhost/api/3/action/datastore_search?resource_id=_table_metadata"
-```
+
+`cd /etc/ckan/default/`
+`paster --plugin=ckan datastore set-permissions -c production.ini | -u postgres psql`
+
+> Si da error es por `sudo`, hacemos lo mismo que antes
+
+`curl http://pruebackan1404.cloudapp.net/api/3/action/datastore_search?resource_id=_table_metadata`
+`curl -X GET "http://localhost/api/3/action/datastore_search?resource_id=_table_metadata"`
+
 
 ### INSTALANDO DATAPUSHER
 
-```
-virtualenv /usr/lib/ckan/default/datapusher
+`virtualenv /usr/lib/ckan/default/datapusher`
 
-mkdir /usr/lib/ckan/default/datapusher/src
-cd /usr/lib/ckan/default/datapusher/src
-
-git clone -b stable https://github.com/ckan/datapusher.git
-
-cd datapusher
-/usr/lib/ckan/default/datapusher/bin/pip install -r requirements.txt
-/usr/lib/ckan/default/datapusher/bin/python setup.py develop
-```
+`mkdir /usr/lib/ckan/default/datapusher/src`
+`cd /usr/lib/ckan/default/datapusher/src`
+`git clone -b stable https://github.com/ckan/datapusher.git`
+`cd datapusher`
+`/usr/lib/ckan/default/datapusher/bin/pip install -r requirements.txt`
+`/usr/lib/ckan/default/datapusher/bin/python setup.py develop`
 `nano /etc/apache2/sites-available/datapusher.conf`
 
 ```
@@ -276,10 +284,9 @@ WSGISocketPrefix /var/run/wsgi
 </VirtualHost>
 ```
 
-```
-cp deployment/datapusher.wsgi /etc/ckan/default
-cp deployment/datapusher_settings.py /etc/ckan/default
-```
+`cp deployment/datapusher.wsgi /etc/ckan/default`
+`cp deployment/datapusher_settings.py /etc/ckan/default`
+
 `nano /etc/apache2/ports.conf`
 > Añadir 
 `"Listen 8800"`
@@ -302,10 +309,9 @@ cp deployment/datapusher_settings.py /etc/ckan/default
 
 ### Instalar PDF_VIEW
 
+> Activate:
 `. /usr/lib/ckan/default/bin/activate`
-
 `pip install ckanext-pdfview`
-
 `nano /etc/ckan/default/production.ini`
 
 > Añadir `pdf_view` a `ckan.plugins` y `ckan.views.default_views`
